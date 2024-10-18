@@ -1,0 +1,51 @@
+version: "3"
+
+services:   
+  nudesDb:
+    image: postgres:15.6
+    container_name: nudesDb
+    restart: always
+    env_file: 
+      - .env
+    volumes:
+      - pg_vol:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - server
+
+  
+  nudesAdminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - server
+    environment:
+      - ADMINER_DESIGN=dracula
+    
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: ../Backend
+    restart: always
+    depends_on:
+      - nudesDb
+    ports:
+      - 8000:8000
+    networks:
+      - server
+    healthcheck:
+      test: ["CMD", "wget", "localhost:8000/docs -q -O - > /dev/null 2>&1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      - TZ=Europe/Moscow
+
+volumes:
+  pg_vol:
+
+networks:
+  server:
