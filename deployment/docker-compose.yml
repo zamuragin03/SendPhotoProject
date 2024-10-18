@@ -28,7 +28,7 @@ services:
   api:
     build:
       dockerfile: Dockerfile
-      context: ../Backend
+      context: ../backend
     restart: always
     depends_on:
       - nudesDb
@@ -36,6 +36,8 @@ services:
       - 8000:8000
     networks:
       - server
+    volumes:
+      - photos:/app/user_photos
     healthcheck:
       test: ["CMD", "wget", "localhost:8000/docs -q -O - > /dev/null 2>&1"]
       interval: 30s
@@ -46,6 +48,7 @@ services:
 
 volumes:
   pg_vol:
+  photos:
 
 networks:
   server:
